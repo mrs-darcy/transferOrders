@@ -43,7 +43,7 @@ function transferOrders (array $ids): array {
 function checkUserIds (array $ids): array {
 	return array_column(UserTable::getList([
 		'select' => ['ID'],
-		'order' => ['ID' => 'ASC'],
+		'order' => ['ID' => $ids[0] < $ids[1] ? 'ASC' : 'DESC'],
 		'filter' => [
 			'=ID' => $ids,
 		],
@@ -59,32 +59,41 @@ function checkUserIds (array $ids): array {
  * @return array
  */
 function getOrders(int $from, int $to): array {
-	$rsData = Order::getList([
-		'select' => ['ID'],
-		'filter' => [
-			"USER_ID" => $from,    
-		],
-		'order' => ['ID' => 'DESC'],
-		'limit' => 2,
-	]);
-
-	if (!$rsData) {
-		return ['success' => false];
+	try {
+		$rsData = Order::getList([
+			'select' => ['ID'],
+			'filter' => [
+				"USER_ID" => $from,    
+			],
+			'order' => ['ID' => 'DESC'],
+			'limit' => 2,
+		]);
+	} catch (Exception $e) {
+		throw new SystemException('Ошибка! ' . $e->getMessage());
 	}
 
+	$arrRes = [];
+
 	while ($arRow = $rsData->fetch()) {
+
 		$order = Order::load($arRow['ID']);
 
 		if (!$order) {
 			throw new SystemException('Не удалось получить заказ пользователя.');
 		}
 
-		try {
-			$order->setFieldNoDemand('USER_ID', $to);
-			$res = $order->save();
-		} catch (Exception $e) {
-			throw new SystemException('Ошибка! ' . $e->getMessage());
+		$order->setFieldNoDemand('USER_ID', $to);
+		$res = $order->save();
+
+		if(!$res->isSuccess()) {
+			throw new SystemException(implode("<br>\n", $res->getErrorMessages()));
 		}
+
+		$arrRes[] = ['orderId' => $arRow['ID'], 'isSave' => $res->isSuccess()];
 	}
-	return ['success' => true];
+
+	if (!$arrRes) {
+		throw new SystemException('Не удалось получить заказы пользователя.');
+	}
+	return $arrRes;
 }
