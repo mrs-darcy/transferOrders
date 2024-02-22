@@ -68,7 +68,9 @@ function getOrders(int $from, int $to): array {
 		'limit' => 2,
 	]);
 
-	$result = new Result();
+	if (!$rsData) {
+		return ['success' => false];
+	}
 
 	while ($arRow = $rsData->fetch()) {
 		$order = Order::load($arRow['ID']);
@@ -78,17 +80,13 @@ function getOrders(int $from, int $to): array {
 			return ['success' => false];
 		}
 
-        $order->setFieldNoDemand('USER_ID', $to);
-        $res = $order->save();
-
-        $result->addErrors($res->getErrors());
-        $result->addErrors($res->getWarnings());
-
-        return [
-            'errors' => $result->getErrorMessages(),
-            'success' => $result->isSuccess(),
-        ];
+		try {
+			$order->setFieldNoDemand('USER_ID', $to);
+			$res = $order->save();
+		} catch (Exception $e) {
+			throw new SystemException('Ошибка! ' . $e->getMessage());
+			return ['success' => false];
+		}
 	}
-
-	return ['success' => false];
+	return ['success' => true];
 }
