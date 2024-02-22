@@ -77,7 +77,6 @@ function getOrders(int $from, int $to): array {
 
 		if (!$order) {
 			throw new SystemException('Не удалось получить заказ пользователя.');
-			return ['success' => false];
 		}
 
 		try {
@@ -85,7 +84,6 @@ function getOrders(int $from, int $to): array {
 			$res = $order->save();
 		} catch (Exception $e) {
 			throw new SystemException('Ошибка! ' . $e->getMessage());
-			return ['success' => false];
 		}
 	}
 	return ['success' => true];
