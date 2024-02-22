@@ -11,7 +11,7 @@ $result = transferOrders(USER_IDS);
 print_r($result);
 
 /**
- * transferOrders
+ * Передаем заказы.
  *
  * @param  mixed $ids
  * @throws \Bitrix\Main\SystemException
@@ -35,7 +35,7 @@ function transferOrders (array $ids): array {
 }
 
 /**
- * checkUserIds
+ * Проверяем что указанные в массиве идентификаторы есть в таблице пользователей.
  *
  * @param  mixed $ids
  * @return array
@@ -51,7 +51,7 @@ function checkUserIds (array $ids): array {
 }
 
 /**
- * getOrders
+ * Получаем заказы первого пользователя, меняем пользователя данных заказов.
  *
  * @param  mixed $from
  * @param  mixed $to
