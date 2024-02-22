@@ -1,10 +1,14 @@
 <?php
-use Bitrix\Sale\Order;
-use Bitrix\Main\Loader;
+use \Bitrix\Sale\Order;
+use \Bitrix\Main\Loader;
 use \Bitrix\Main\SystemException;
 use \Bitrix\Main\UserTable;
 use \Bitrix\Main\Result;
 
+/**
+ * Первое значение - идентификатор пользователя, от которого переносим заказы (и все остальное).
+ * Второе значение - идентификатор пользователя, которому переносим заказы (и все остальное).
+ */ 
 const USER_IDS = [1, 2];
 
 $result = transferOrders(USER_IDS);
